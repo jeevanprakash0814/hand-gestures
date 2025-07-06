@@ -57,15 +57,22 @@ class HandGestureTracker {
     }
     
     async startCamera() {
-        console.log("trying to start the camera");
         try {
+            console.log('Attempting to access camera...');
+            console.log('Is getUserMedia supported?', navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+            console.log('Current protocol:', window.location.protocol);
+            console.log('Current host:', window.location.host);
+            
             this.stream = await navigator.mediaDevices.getUserMedia({ 
                 video: { width: 640, height: 480 } 
             });
+            console.log('Camera stream obtained successfully');
+            
             this.video.srcObject = this.stream;
             this.video.play();
             
             this.video.addEventListener('loadedmetadata', () => {
+                console.log('Video metadata loaded');
                 this.canvas.width = this.video.videoWidth;
                 this.canvas.height = this.video.videoHeight;
                 this.startTracking();
@@ -75,8 +82,22 @@ class HandGestureTracker {
             this.stopBtn.disabled = false;
             this.status.textContent = 'Camera started. Show your hands to the camera!';
         } catch (err) {
-            this.status.textContent = 'Error accessing camera: ' + err.message;
-            console.error('Error accessing camera:', err);
+            console.error('Detailed error:', err);
+            console.error('Error name:', err.name);
+            console.error('Error message:', err.message);
+            
+            let errorMessage = 'Error accessing camera: ';
+            if (err.name === 'NotAllowedError') {
+                errorMessage += 'Permission denied. Please allow camera access.';
+            } else if (err.name === 'NotFoundError') {
+                errorMessage += 'No camera found.';
+            } else if (err.name === 'NotSupportedError') {
+                errorMessage += 'Camera not supported. Try using HTTPS.';
+            } else {
+                errorMessage += err.message;
+            }
+            
+            this.status.textContent = errorMessage;
         }
     }
     

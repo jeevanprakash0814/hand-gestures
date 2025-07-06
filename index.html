@@ -1,10 +1,189 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand Gesture Tracker</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .video-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        #video {
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 100%;
+            height: auto;
+        }
+        
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 15px;
+            pointer-events: none;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #ff6b6b, #ffa500);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .info-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gesture-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            color: white;
+        }
+        
+        .gesture-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gesture-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+        
+        .gesture-card p {
+            margin: 0;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .status {
+            text-align: center;
+            color: white;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        
+        .detected-gesture {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #00ff00;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
 </head>
 <body>
-    
+    <div class="container">
+        <h1>🖐️ Hand Gesture Tracker</h1>
+        
+        <div class="status" id="status">Click "Start Camera" to begin</div>
+        
+        <div class="controls">
+            <button id="startBtn">Start Camera</button>
+            <button id="stopBtn" disabled>Stop Camera</button>
+            <button id="toggleLandmarks">Toggle Landmarks</button>
+        </div>
+        
+        <div class="video-container">
+            <video id="video" width="640" height="480" style="display: none;"></video>
+            <canvas id="canvas" width="640" height="480"></canvas>
+        </div>
+        
+        <div class="info-panel">
+            <div class="gesture-info">
+                <div class="gesture-card" id="thumbsUp">
+                    <h3>👍 Thumbs Up</h3>
+                    <p>Detected: <span id="thumbsUpCount">0</span> times</p>
+                </div>
+                <div class="gesture-card" id="peace">
+                    <h3>✌️ Peace Sign</h3>
+                    <p>Detected: <span id="peaceCount">0</span> times</p>
+                </div>
+                <div class="gesture-card" id="fist">
+                    <h3>✊ Fist</h3>
+                    <p>Detected: <span id="fistCount">0</span> times</p>
+                </div>
+                <div class="gesture-card" id="openHand">
+                    <h3>🖐️ Open Hand</h3>
+                    <p>Detected: <span id="openHandCount">0</span> times</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mediapipe/0.10.3/hands.min.js"></script>
+    <script src="gesture-tracker.js"></script>
 </body>
 </html>
